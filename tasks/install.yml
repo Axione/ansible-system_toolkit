@@ -32,7 +32,7 @@
     mode: "{{ item.mode | default('0644') }}"
   loop: "{{ toolkit_copy_files }}"
 
-- name: Sync large directory
+- name: "Sync large directory"
   become: true
   become_user: "{{ item.owner | default('root') }}"
   ansible.posix.synchronize:
@@ -41,3 +41,14 @@
     delete: "{{ item.delete | default(true) }}"
     recursive: "{{ item.recursive | default(true) }}"
   loop: "{{ toolkit_sync_dirs }}"
+
+- name: "Run commands"
+  become: true
+  become_user: "{{ item.owner | default('root') }}"
+  ansible.builtin.shell:
+    cmd: "{{ item.cmd }}"
+  args:
+    executable: "{{ item.executable | default('/bin/bash') }}"
+    chdir: "{{ item.chdir | default(omit) }}"
+  changed_when: false
+  loop: "{{ toolkit_run_commands }}"
